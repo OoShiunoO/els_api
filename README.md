@@ -13,6 +13,7 @@ IP : 10.97.13.150:9000
 
 ## Common
 #### Request
+
 Property | Type | Description | Required
 --|--|--|--
 `pretty`| | JSON pretty print, 可不用key值   |
