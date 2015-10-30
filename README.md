@@ -41,7 +41,7 @@ Property | Type | Description | Required
 `size` |  integer | 每頁呈現商品數 `default = 20`|
 `filter` |  string | 對搜尋結果的filter,可直接使用`response:aggregations:category_path_id`|
 `platform`|  string  | 來源平台, `App: IOS & Android`, `Web: 大網`, `default=Web`  | (還未依各平台做個別呈現)
-`sort` | string | 商品排序方式, `Related: 最相關`, `PriceLow: 網路價從低到高`, `PriceHigh: 網路價從高到低`,  `default=Related`
+`sort` | string | 商品排序方式, `Related: 最相關`, `PriceLow: 網路價從低到高`, `PriceHigh: 網路價從高到低`, `default=Related`  | 
 `price_lower` | integer | 網路價價格區間(低) | 含本身, 小於等於0不處理
 `price_upper` | integer | 網路價價格區間(高) | 含本身, 小於等於0不處理
 
