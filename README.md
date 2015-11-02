@@ -57,7 +57,7 @@ Property | Type | Description | Required
 
 * 搜尋雙肩後背包、找`3C#S0:　>　NB筆電#581　>　品牌筆電包#14242` 目錄底下的商品、價格區問1800~3000
 ```
-10.97.13.150:9000/elsapi/search?platform=Web&query=金牌啤酒&filter=S0:>581:>14242&price_lower=300&price_upper=2000
+10.97.13.150:9000/search?platform=Web&query=雙肩後背包&filter=S0:>581>14242&price_lower=1800&price_upper=3000
 ```
 
 
