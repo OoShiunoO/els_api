@@ -1,3 +1,5 @@
+import Dependency._
+
 name := """els_api"""
 
 version := "1.0-SNAPSHOT"
@@ -8,12 +10,14 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   jdbc,
-//  cache,
-//  ws,
+  cache,
+  ws,
   specs2 % Test
 )
 
-libraryDependencies += "com.sksamuel.elastic4s" %% "elastic4s-core" % "1.7.4"
+libraryDependencies ++= Seq(
+  elsClient
+)
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 

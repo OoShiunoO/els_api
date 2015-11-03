@@ -6,13 +6,16 @@ import com.feec.search.api.common.utils.DateUtils
 import com.feec.search.api.models.{ElsFilter, ElsPrefixFilter, ElsRangeFilter}
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.typesafe.config.ConfigFactory
 
 object ElsClient {
+  val config = ConfigFactory.load()
+  val elsIp = config.getString("ELS.ip")
+  val elsPort = config.getInt("ELS.port")
+
   var currentElsClient: ElsClient = _
 
-  def connectEls = ElasticClient.remote("localhost", 9300)
-
-  //  def connectEls = ElasticClient.remote("192.168.50.125", 9300)
+  def connectEls = ElasticClient.remote(elsIp, elsPort)
 
   def typeName = {
     if (currentElsClient == null || (System.currentTimeMillis > currentElsClient.dayLastSeconds)) {
@@ -30,6 +33,7 @@ object ElsClient {
 }
 
 class ElsClient(val currentTypeName: String, val dayLastSeconds: Long)
+
 
 object ElsColumnDefine {
   def defineFilter(filter: ElsFilter) = filter match {
