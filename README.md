@@ -1,30 +1,39 @@
 # Elastic Search engine API
 build on play framework 2.4 with scala development
 
+IP : 10.97.13.150:9000
+
+
+## api spec
+提供功能, [els api spec overview](/doc/els_api_spec.html)
+* search
+
+
+## Deployment
 ### package
 `activator clean dist`
 
-
-IP : 10.97.13.150:9000
-
 ### run
-local端需先切到activator cli底下, run才能吃-D參數
+cp `${project}/target/universal/els_api.zip` to server and unzip
+
+* run pre_production
+
 ```
-activator
-run
+${project}/bin/els_api -Dconfig.resource=pre_prod.conf -Dlogger.resource=pre_prod_logback.xml
 ```
 
-pre_prod
+* run production
+
 ```
+${project}/bin/els_api -Dconfig.resource=prod.conf -Dlogger.resource=prod_logback.xml
+```
+
+* run on 10.97.13.150, simply use shell
+
+```
+## pre_production
 /home/steven/els_api/run_pre_prod.sh
-```
 
-production
-```
+## production
 /home/steven/els_api/run_prod.sh
 ```
-
-
-### api spec
-提供功能, [els api spec overview](/doc/els_api_spec.html)
-* search
