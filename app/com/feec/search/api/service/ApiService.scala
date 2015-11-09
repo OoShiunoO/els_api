@@ -10,7 +10,7 @@ import play.api.libs.json.{JsError, JsObject, JsResult, JsSuccess, _}
 import scala.util.Try
 
 
-object ApiCheck {
+object ApiService {
   val antiHTML = """<[^>]*>""".r
 
   def checkSearchJsonResult(jsonResult: JsResult[JsObject], time: Long) = jsonResult match {
@@ -90,9 +90,8 @@ object ApiCheck {
     else
       None
   }
-
-
-  def addApiResponse(jsonObj: JsObject, code: ReturnCode.Code, took: Long) = {
-    Json.obj("statuc_code" -> code.statusCode, "status_mesasge" -> code.message, "took" -> took) ++ jsonObj
-  }
 }
+
+
+
+
