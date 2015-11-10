@@ -97,7 +97,7 @@ object QueryClient {
       case Platform.Web =>
         (__ \ 'data).json.copyFrom(
           (__ \ 'total).json.copyFrom((__ \ 'hits \ 'total).json.pick) and
-            (__ \ 'hits).json.copyFrom((__ \ 'hits \ 'hits).json.pick(
+            (__ \ 'products).json.copyFrom((__ \ 'hits \ 'hits).json.pick(
               of[JsArray].map { case JsArray(arr) => JsArray(arr.map {
                 _.transform((__ \ '_source).json.pick).get
               })
@@ -165,7 +165,7 @@ object QueryClient {
                   ).get
               })
               })) and
-            (__ \ 'filter).json.copyFrom(
+            (__ \ 'aggregations).json.copyFrom(
               (__ \ 'aggregations \ 'category_aggs \ 'buckets).json.pick(
                 of[JsArray].map { case JsArray(arr) => JsArray(arr.filter {
                   _.transform((__ \ 'key).json.pick).get.as[String].split("　>　").length == 1
@@ -178,19 +178,16 @@ object QueryClient {
                       (__ \ 'count).json.copyFrom((__ \ 'doc_count).json.pick)
                       reduce
                     ).get
-                  //                    Json.obj("category_path_name" -> JsString(category._1), "category_path_id" -> JsString(category._2), "doc_count" -> agg.transform((__ \ 'doc_count).json.pick).get)
                 })
                 }
               )
 
             )
-
             reduce
         )
     }
 
     val result = json.transform(elsToClean)
-
     result
   }
 

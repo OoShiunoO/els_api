@@ -34,6 +34,7 @@ class SearchController extends Controller {
 
     val jsonObj = code match {
       case ReturnCode.RespOk => extractJsonResult.get
+      case ReturnCode.NoMoreResult => JsonService.cleanAggregations(extractJsonResult.get)
       case ReturnCode.Empty => extractJsonResult.get
       case ReturnCode.JsonParseError => JsonService.emptySearchResponse
       case ReturnCode.LostNecessary => JsonService.emptySearchResponse
