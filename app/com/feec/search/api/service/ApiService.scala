@@ -14,14 +14,18 @@ object ApiService {
   val antiHTML = """<[^>]*>""".r
 
   def checkSearchJsonResult(jsonResult: JsResult[JsObject], time: Long) = jsonResult match {
-    case s: JsSuccess[JsObject] =>
-      val jsonObj = s.get
-      if (jsonObj.transform((__ \ 'data \ 'total).json.pick).get.as[Int] > 0)
+    case JsSuccess(jsonObj, jsPath) =>
+      val total = jsonObj.transform((__ \ 'data \ 'total).json.pick).get.as[Int]
+      val products = jsonObj.transform((__ \ 'data \ 'products).json.pick).get.as[Seq[JsObject]]
+
+      if (products.size > 0 && total > 0)
         ReturnCode.RespOk
+      else if (total > 0)
+        ReturnCode.NoMoreResult
       else
         ReturnCode.Empty
 
-    case e: JsError =>
+    case JsError(e) =>
       println("Errors: " + JsError.toJson(e).toString())
       ReturnCode.JsonParseError
   }
