@@ -1,21 +1,20 @@
 package com.feec.search.api.common.enum
 
-object ReturnCode {
+object Response {
 
-  sealed abstract class Code(val statusCode: Int, val message: String)
+  sealed abstract class Status(val code: Int, val message: String)
 
-  case object LostNecessary extends Code(100, "lost necessary parameter")
+  case object LostNecessary extends Status(100, "lost necessary parameter")
 
-  case object RespOk extends Code(200, "response ok")
+  case object Ok extends Status(200, "response ok")
 
-  case object NoMoreResult extends Code(300, "no more result")
+  case object NoMoreResults extends Status(300, "no more results")
 
-  case object Empty extends Code(400, "empty search result")
+  case object Empty extends Status(400, "empty search result")
 
-  case object InternalException extends Code(500, "internal exception")
+  case object Error extends Status(500, "internal exception")
 
-  case object JsonParseError extends Code(600, "json parse error")
-
+  case object JsonParseError extends Status(600, "json parse error")
 
 }
 

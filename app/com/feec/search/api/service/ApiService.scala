@@ -13,21 +13,21 @@ import scala.util.Try
 object ApiService {
   val antiHTML = """<[^>]*>""".r
 
-  def checkSearchJsonResult(jsonResult: JsResult[JsObject], time: Long) = jsonResult match {
+  def checkSearchJsonResult(jsonResult: JsResult[JsObject]) = jsonResult match {
     case JsSuccess(jsonObj, jsPath) =>
-      val total = jsonObj.transform((__ \ 'data \ 'total).json.pick).get.as[Int]
-      val products = jsonObj.transform((__ \ 'data \ 'products).json.pick).get.as[Seq[JsObject]]
+      val total = jsonObj.transform((__ \ 'payload \ 'total).json.pick).get.as[Int]
+      val products = jsonObj.transform((__ \ 'payload \ 'products).json.pick).get.as[Seq[JsObject]]
 
       if (products.size > 0 && total > 0)
-        ReturnCode.RespOk
+        Response.Ok
       else if (total > 0)
-        ReturnCode.NoMoreResult
+        Response.NoMoreResults
       else
-        ReturnCode.Empty
+        Response.Empty
 
     case JsError(e) =>
       println("Errors: " + JsError.toJson(e).toString())
-      ReturnCode.JsonParseError
+      Response.JsonParseError
   }
 
   def checkSearchCondition(oric: OriSearchCondition) = {
