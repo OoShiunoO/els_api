@@ -95,7 +95,7 @@ object QueryClient {
 
     val elsToClean = platform match {
       case Platform.Web =>
-        (__ \ 'data).json.copyFrom(
+        (__ \ 'payload).json.copyFrom(
           (__ \ 'total).json.copyFrom((__ \ 'hits \ 'total).json.pick) and
             (__ \ 'products).json.copyFrom((__ \ 'hits \ 'hits).json.pick(
               of[JsArray].map { case JsArray(arr) => JsArray(arr.map {
@@ -120,7 +120,7 @@ object QueryClient {
             )
             reduce)
       case Platform.App =>
-        (__ \ 'data).json.copyFrom(
+        (__ \ 'payload).json.copyFrom(
           (__ \ 'total).json.copyFrom((__ \ 'hits \ 'total).json.pick) and
             (__ \ 'products).json.copyFrom((__ \ 'hits \ 'hits).json.pick(
               of[JsArray].map { case JsArray(arr) => JsArray(arr.map {

@@ -1,6 +1,6 @@
 package com.feec.search.api.controllers
 
-import com.feec.search.api.common.enum.ReturnCode
+import com.feec.search.api.common.enum.Response
 import com.feec.search.api.common.utils.JsonUtils
 import com.feec.search.api.models.OriSearchCondition
 import com.feec.search.api.service.{ApiService, JsonService, QueryClient}
@@ -12,37 +12,37 @@ class SearchController extends Controller {
 
   def query = Action { request =>
 
-    val current = System.currentTimeMillis()
+    val receiveTime = System.currentTimeMillis()
 
     val condition = ApiService.checkSearchCondition(OriSearchCondition(request.getQueryString("query"), request.getQueryString("page"), request.getQueryString("size"), request.getQueryString("filter"), request.getQueryString("platform"), request.getQueryString("sort"), request.getQueryString("price_lower"), request.getQueryString("price_upper")))
 
     lazy val searchResponse = QueryClient.query(condition.get)
     lazy val extractJsonResult = QueryClient.extractSearchResponse(searchResponse, condition.get.platform)
 
-    val code = try {
+    val status = try {
       condition match {
         case Some(_) =>
-          ApiService.checkSearchJsonResult(extractJsonResult, current)
+          ApiService.checkSearchJsonResult(extractJsonResult)
         case None =>
-          ReturnCode.LostNecessary
+          Response.LostNecessary
       }
     } catch {
       case NonFatal(e) =>
         e.printStackTrace()
-        ReturnCode.InternalException
+        Response.Error
     }
 
-    val jsonObj = code match {
-      case ReturnCode.RespOk => extractJsonResult.get
-      case ReturnCode.NoMoreResult => JsonService.cleanAggregations(extractJsonResult.get)
-      case ReturnCode.Empty => extractJsonResult.get
-      case ReturnCode.JsonParseError => JsonService.emptySearchResponse
-      case ReturnCode.LostNecessary => JsonService.emptySearchResponse
-      case ReturnCode.InternalException => JsonService.emptySearchResponse
+    val jsonObj = status match {
+      case Response.Ok => extractJsonResult.get
+      case Response.NoMoreResults => JsonService.cleanAggregations(extractJsonResult.get)
+      case Response.Empty => JsonService.emptySearchResponse
+      case Response.JsonParseError => JsonService.emptySearchResponse
+      case Response.LostNecessary => JsonService.emptySearchResponse
+      case Response.Error => JsonService.emptySearchResponse
     }
 
 
-    val finalJsonObj = JsonService.addHeader(jsonObj, code, System.currentTimeMillis() - current)
+    val finalJsonObj = JsonService.addHeader(jsonObj, status, receiveTime)
 
     val pretty = request.getQueryString("pretty")
 
