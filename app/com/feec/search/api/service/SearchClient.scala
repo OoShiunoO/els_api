@@ -30,37 +30,43 @@ object QueryClient {
         s"""{
            |  "bool": {
            |            "should": [
-           |                { "match": { "product_name":
-           |                    {"query":"$queryString" ,
+           |                { "match": { "all_category_path_name":
+           |                    {"query":"$queryString",
            |                    "operator" : "or",
-           |                      "boost" : 10
+           |                      "boost" : 1
+           |                    }
+           |                  }
+           |                },
+           |                { "match": { "product_name":
+           |                    {"query":"$queryString",
+           |                    "operator" : "or",
+           |                      "boost" : 2.3333
            |                    }
            |                  }
            |                },
            |                { "match": { "desc_brief":
-           |                    {"query":"$queryString" ,
+           |                    {"query":"$queryString",
            |                    "operator" : "or",
-           |                      "boost" : 5
+           |                      "boost" : 2
            |                    }
            |                  }
            |                },
-           |                { "match": { "name_label":
-           |                    {"query":"$queryString" ,
+           |                { "match": { "author":
+           |                    {"query":"$queryString",
            |                    "operator" : "or",
-           |                      "boost" : 4
+           |                      "boost" : 2
            |                    }
            |                  }
            |                },
-           |                { "match": { "all_category_path_name":
-           |                    {"query":"$queryString" ,
+           |                { "match": { "publisher":
+           |                    {"query":"$queryString",
            |                    "operator" : "or",
-           |                      "boost" : 1
+           |                      "boost" : 1.6667
            |                    }
            |                  }
            |                }
            |            ]
            |        }
-           |
            |  }
            | """.stripMargin
       } aggs {
