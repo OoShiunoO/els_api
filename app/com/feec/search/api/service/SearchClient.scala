@@ -51,7 +51,7 @@ object QueryClient {
            |                    }
            |                  }
            |                },
-           |                { "match": { "category_path":
+           |                { "match": { "all_category_path_name":
            |                    {"query":"$queryString" ,
            |                    "operator" : "or",
            |                      "boost" : 1
