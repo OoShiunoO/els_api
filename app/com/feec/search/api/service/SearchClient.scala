@@ -64,6 +64,13 @@ object QueryClient {
            |                      "boost" : 1.6667
            |                    }
            |                  }
+           |                },
+           |                { "match": { "isbn":
+           |                    {"query":"$queryString",
+           |                    "operator" : "or",
+           |                      "boost" : 1.6667
+           |                    }
+           |                  }
            |                }
            |            ]
            |        }
