@@ -51,8 +51,8 @@ object ApiService {
       }
 
       val sortList = sort match {
-        case Sort.PriceHigh => List(ElsSort("market_price", SortOrder.DESC))
-        case Sort.PriceLow => List(ElsSort("market_price", SortOrder.ASC))
+        case Sort.PriceHigh => List(ElsSort("member_price", SortOrder.DESC))
+        case Sort.PriceLow => List(ElsSort("member_price", SortOrder.ASC))
         case Sort.Related => Nil
       }
 
@@ -79,7 +79,7 @@ object ApiService {
 
       val rangeFilter = (priceLower, priceUpper) match {
         case (None, None) => None
-        case _ => Option(ElsRangeFilter("market_price", priceLower, priceUpper))
+        case _ => Option(ElsRangeFilter("member_price", priceLower, priceUpper))
       }
 
       val prefixFilter = oric.filter match {
