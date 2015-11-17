@@ -21,7 +21,7 @@ object Response {
 
 object Platform extends Enumeration {
   type Platform = Value
-  val Web, App = Value
+  val Web, App, Debug = Value
 }
 
 object Sort extends Enumeration {

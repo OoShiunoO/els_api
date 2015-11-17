@@ -198,6 +198,50 @@ object QueryClient {
             )
             reduce
         )
+      case Platform.Debug =>
+        (__ \ 'payload).json.copyFrom(
+          (__ \ 'total).json.copyFrom((__ \ 'hits \ 'total).json.pick) and
+            (__ \ 'max_score).json.copyFrom((__ \ 'hits \ 'max_score).json.pick) and
+            (__ \ 'products).json.copyFrom((__ \ 'hits \ 'hits).json.pick(
+              of[JsArray].map { case JsArray(arr) =>
+                val seqJsObj = for (index <- 0 until arr.size) yield {
+                  val jsObj = arr(index)
+
+                  jsObj.transform((__ \ 'score).json.copyFrom((__ \ '_score).json.pick) and
+                    (__ \ 'rank).json.put(JsNumber(index + 1)) and
+                    (__ \ '_source).json.pickBranch(
+                      (__ \ 'product_id).json.pickBranch and
+                        (__ \ 'product_name).json.pickBranch and
+                        (__ \ 'all_category_path_name).json.pickBranch and
+                        (__ \ 'desc_brief).json.pickBranch and
+                        (__ \ 'author).json.pickBranch and
+                        (__ \ 'publisher).json.pickBranch and
+                        (__ \ 'isbn).json.pickBranch
+                        reduce
+                    )
+                    reduce
+                  ).get
+
+                }
+                JsArray(seqJsObj)
+              }
+            )) and
+            (__ \ 'aggregations).json.copyFrom(
+              (__ \ 'aggregations \ 'category_aggs \ 'buckets).json.pick(
+                of[JsArray].map { case JsArray(arr) => JsArray(arr.map {
+                  agg =>
+                    val key = agg.transform((__ \ 'key).json.pick).get.as[String]
+                    val category = splitCategory(key)
+                    agg.transform((__ \ 'category_path_name).json.put(JsString(category._1)) and
+                      (__ \ 'category_path_id).json.put(JsString(category._2)) and
+                      (__ \ 'doc_count).json.pickBranch
+                      reduce
+                    ).get
+                })
+                }
+              )
+            )
+            reduce)
     }
 
     val result = json.transform(elsToClean)
@@ -212,5 +256,6 @@ object QueryClient {
 
     (split.map(_._1).mkString("　>　"), split.map(_._2).mkString(">"))
   }
+
 }
 
