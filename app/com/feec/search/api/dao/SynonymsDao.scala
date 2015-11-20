@@ -7,8 +7,8 @@ import com.feec.search.api.models.{SynonymsMain, SynonymsRelated}
 
 
 object SynonymsDao {
-  val synonymsSql = "select * from synonyms_main m where m.status = 0 and exists (select * from  synonyms_related r where m.id = r.main_id and r.type = 'SYN' and r.status = 0 and r.related_terms = ? )"
-  val relatedSql = "select * from synonyms_related o where o.type = 'REL' and o.status = 0 and o.main_id in (select main_id from  synonyms_related where related_terms =  ?)"
+  val synonymsSql = "select * from synonyms_main m where m.status = 0 and exists (select * from  synonyms_related r where m.id = r.main_id and r.communication = 1 and r.status = 0 and r.related_term = ? )"
+  val relatedSql = "select * from synonyms_related o where o.type = 'REL' and o.status = 0 and o.main_id in (select main_id from  synonyms_related where related_term =  ?)"
 
 
   def synonyms(word: String, conn: Connection) = {
@@ -18,7 +18,7 @@ object SynonymsDao {
       ps
     } {
       rs =>
-        SynonymsMain(rs.getInt("id"), rs.getString("original_terms"), rs.getInt("status"))
+        SynonymsMain(rs.getInt("id"), rs.getString("original_term"), rs.getInt("status"))
 
     }(false)
 
@@ -31,7 +31,7 @@ object SynonymsDao {
       ps
     } {
       rs =>
-        SynonymsRelated(rs.getInt("main_id"), rs.getString("related_terms"), SynonymsType.valueOf(rs.getString("type")), rs.getInt("status"))
+        SynonymsRelated(rs.getInt("main_id"), rs.getString("related_term"), SynonymsType.valueOf(rs.getInt("communication")), rs.getInt("status"))
 
     }(false)
 
