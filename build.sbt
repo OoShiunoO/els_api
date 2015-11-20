@@ -16,7 +16,9 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  elsClient
+  elsClient,
+  mysql,
+  c3p0
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
