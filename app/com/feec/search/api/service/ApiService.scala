@@ -34,7 +34,7 @@ object ApiService {
     if (oric.oriQueryString.isDefined) {
       val queryString = antiHTML.replaceAllIn(oric.oriQueryString.get, "").split(" ").map {
         SynonymsService.keywordSynonyms(_)
-      }.mkString(" ").replace(" ", "　")
+      }.mkString("　")
 
       println(queryString)
 

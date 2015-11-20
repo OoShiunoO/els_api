@@ -11,17 +11,18 @@ object SynonymsService {
     lazy val conn = DCConnectionPool.getConnection()
 
     try {
-      val synonymsWord = SynonymsDao.synonyms(key, conn) match {
+      SynonymsDao.synonyms(key, conn) match {
         case Some(syn) => syn.originalTerms
         case None => key
       }
 
-      SynonymsDao.synonymsRelated(synonymsWord, conn) match {
-        case Some(rel) => rel.map {
-          _.relatedTerms
-        }.mkString(" ")
-        case None => synonymsWord
-      }
+      //相關詞待構思
+      //      SynonymsDao.synonymsRelated(synonymsWord, conn) match {
+      //        case Some(rel) => rel.map {
+      //          _.relatedTerms
+      //        }.mkString(" ")
+      //        case None => synonymsWord
+      //      }
     }
     catch {
       case NonFatal(e) => e.printStackTrace
