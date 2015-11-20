@@ -36,8 +36,6 @@ object ApiService {
         SynonymsService.keywordSynonyms(_)
       }.mkString("　")
 
-      println(queryString)
-
       val platform = oric.platform match {
         case Some(s) => Try {
           Platform.withName(s)
