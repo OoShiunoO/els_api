@@ -20,7 +20,7 @@ object SynonymsDao {
       rs =>
         SynonymsMain(rs.getInt("id"), rs.getString("original_term"), rs.getInt("status"))
 
-    }(false)
+    }(closeConnection = false)
 
   }
 
@@ -33,7 +33,7 @@ object SynonymsDao {
       rs =>
         SynonymsRelated(rs.getInt("main_id"), rs.getString("related_term"), SynonymsType.valueOf(rs.getInt("communication")), rs.getInt("status"))
 
-    }(false)
+    }(closeConnection = false)
 
   }
 
