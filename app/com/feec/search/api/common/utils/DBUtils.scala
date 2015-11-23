@@ -1,6 +1,6 @@
 package com.feec.search.api.common.utils
 
-import java.sql.DriverManager
+import java.sql.{Connection, DriverManager}
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.typesafe.config.ConfigFactory
@@ -18,6 +18,15 @@ object DBUtils {
    */
   def connect(uri: String, user: String, password: String) =
     DriverManager.getConnection(uri, user, password)
+
+
+  def rollback(conn: Connection) = {
+    try {
+      conn.rollback()
+    } catch {
+      case ex: Throwable =>
+    }
+  }
 
 
   /**
@@ -47,6 +56,10 @@ object DCConnectionPool {
   pool.setPassword(ecConfig.getString("password"))
   pool.setMaxPoolSize(15)
 
-  def getConnection() = pool.getConnection
+  def getConnection() = {
+    val conn = pool.getConnection
+    conn.setAutoCommit(false)
+    conn
+  }
 
 }
