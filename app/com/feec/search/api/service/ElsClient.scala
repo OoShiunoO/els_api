@@ -18,15 +18,18 @@ object ElsClient {
   def connectEls = ElasticClient.remote(elsIp, elsPort)
 
   def typeName = {
-    if (currentElsClient == null || (System.currentTimeMillis > currentElsClient.dayLastSeconds)) {
+    if (currentElsClient == null || System.currentTimeMillis > currentElsClient.dayLastSeconds) {
       currentElsClient = initElsClient
     }
+    println(s"${System.currentTimeMillis} : ${currentElsClient.dayLastSeconds} : ${currentElsClient.currentTypeName}")
     currentElsClient.currentTypeName
   }
 
 
   def initElsClient = {
     val today = new Date
+    println(s"init...els client $today")
+
     new ElsClient(s"index_${DateUtils.formatDate(today).get}", DateUtils.lastSeconds(today))
   }
 
