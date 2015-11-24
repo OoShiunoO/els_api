@@ -64,7 +64,7 @@ object ApiService {
         case None => 1
       }
       val size = TransformUtils.parseInt(oric.size) match {
-        case Some(s) => if (s <= 0) 20 else s
+        case Some(s) => if (s < 10) 20 else s
         case None => 20
       }
 
@@ -85,7 +85,7 @@ object ApiService {
       }
 
       val prefixFilter = oric.filter match {
-        case Some(filter) => Option(ElsPrefixFilter("all_category_path_id", filter))
+        case Some(filterString) => Option(ElsPrefixFilter("all_category_path_id", filterString))
         case None => None
       }
 

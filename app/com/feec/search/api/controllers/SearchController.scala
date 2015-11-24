@@ -3,7 +3,7 @@ package com.feec.search.api.controllers
 import com.feec.search.api.common.enum.Response
 import com.feec.search.api.common.utils.JsonUtils
 import com.feec.search.api.models.OriSearchCondition
-import com.feec.search.api.service.{ApiService, JsonService, QueryClient}
+import com.feec.search.api.service.{ApiService, JsonService, QueryClient, TrackService}
 import play.api.mvc._
 
 import scala.util.control.NonFatal
@@ -47,6 +47,9 @@ class SearchController extends Controller {
     val pretty = request.getQueryString("pretty")
 
     val finalJsonString = JsonUtils.pretty(finalJsonObj, pretty)
+
+    //data collection, use Future
+    TrackService.searchDataCollection(condition, request.remoteAddress, finalJsonString)
 
     Ok(finalJsonString).as(JSON)
 
