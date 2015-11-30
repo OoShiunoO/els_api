@@ -55,6 +55,8 @@ object DCConnectionPool {
   pool.setUser(ecConfig.getString("user"))
   pool.setPassword(ecConfig.getString("password"))
   pool.setMaxPoolSize(15)
+  pool.setTestConnectionOnCheckin(true)
+  pool.setIdleConnectionTestPeriod(30)
 
   def getConnection() = {
     val conn = pool.getConnection
