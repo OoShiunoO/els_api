@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   elsClient,
   mysql,
+  slick,
   c3p0
 )
 
