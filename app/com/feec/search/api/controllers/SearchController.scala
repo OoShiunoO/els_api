@@ -1,10 +1,12 @@
 package com.feec.search.api.controllers
 
 import com.feec.search.api.common.enum.Response
-import com.feec.search.api.common.utils.JsonUtils
+import com.feec.search.api.common.utils.{DateUtils, JsonUtils}
 import com.feec.search.api.models.OriSearchCondition
 import com.feec.search.api.service.{ApiService, JsonService, SearchClient, TrackService}
 import com.google.inject.Inject
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc._
 import slick.driver.JdbcProfile
@@ -17,7 +19,7 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
 
   def query = Action.async { request =>
 
-    val receiveTime = System.currentTimeMillis()
+    val receiveTime = new DateTime()
 
     val condition = ApiService.checkSearchCondition(OriSearchCondition(request.getQueryString("query"), request.getQueryString("page"), request.getQueryString("size"), request.getQueryString("filter"), request.getQueryString("platform"), request.getQueryString("sort"), request.getQueryString("price_lower"), request.getQueryString("price_upper")))
 
@@ -48,7 +50,7 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
       }
 
 
-      val finalJsonObj = JsonService.addHeader(jsonObj, status, receiveTime)
+      val finalJsonObj = JsonService.addHeader(jsonObj, status, DateUtils.TIMESTAMP_FORMATTER.print(receiveTime))
 
       val pretty = request.getQueryString("pretty")
 
