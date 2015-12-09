@@ -6,7 +6,6 @@ import com.feec.search.api.models.OriSearchCondition
 import com.feec.search.api.service.{ApiService, JsonService, SearchClient, TrackService}
 import com.google.inject.Inject
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc._
 import slick.driver.JdbcProfile

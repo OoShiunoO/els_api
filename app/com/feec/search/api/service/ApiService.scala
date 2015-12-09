@@ -57,14 +57,14 @@ object ApiService {
         case Sort.PriceLow => List(ElsSort("member_price", SortOrder.ASC))
         case Sort.Related => Nil
       }
-
-
+      
       val page = TransformUtils.parseInt(oric.page) match {
         case Some(p) => if (p <= 0) 1 else p
         case None => 1
       }
+
       val size = TransformUtils.parseInt(oric.size) match {
-        case Some(s) => if (s < 10) 20 else s
+        case Some(s) => if (s <= 0) 20 else s
         case None => 20
       }
 
