@@ -45,9 +45,9 @@ object ElasticQueryProcessing {
         val matchAlt2 = s.map(w => matchBlock(w._2 + tails, 1)).mkString(",")
 
         s"""{
-           |  "bool": {
-           |            "should": [
-           |            $matchAlt2
+            |  "bool": {
+            |            "should": [
+            |            $matchAlt2
             |            ]
             |        }
             |}

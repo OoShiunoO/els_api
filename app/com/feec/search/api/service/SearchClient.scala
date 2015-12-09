@@ -56,6 +56,7 @@ object SearchClient {
         println(s"query json : $queryDefine")
         queryDefine
       }
+      result.onComplete(w => client.close())
 
       result
     }
