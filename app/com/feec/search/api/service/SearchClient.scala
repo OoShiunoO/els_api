@@ -33,7 +33,6 @@ object SearchClient {
 
 
     ElasticQueryProcessing.mainQuery(queryString, dbConfig).flatMap{ kk =>
-      println(kk.length + "=============================")
       val result = client.execute {
         val queryDefine = search in "product" / typeName start startNum limit size rawQuery {
           kk

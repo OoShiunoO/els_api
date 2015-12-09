@@ -32,9 +32,7 @@ object ApiService {
 
   def checkSearchCondition(oric: OriSearchCondition) = {
     if (oric.oriQueryString.isDefined) {
-      val queryString = antiHTML.replaceAllIn(oric.oriQueryString.get, "").split(" ").map {
-        SynonymsService.keywordSynonyms(_)
-      }.mkString("　")
+      val queryString = antiHTML.replaceAllIn(oric.oriQueryString.get, "").split(" ").mkString("　")
 
       val platform = oric.platform match {
         case Some(s) => Try {
