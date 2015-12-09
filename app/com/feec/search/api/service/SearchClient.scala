@@ -5,102 +5,62 @@ import com.feec.search.api.common.enum.Platform
 import com.feec.search.api.common.enum.Platform._
 import com.feec.search.api.common.utils.TransformUtils
 import com.feec.search.api.models.SearchCondition
+
 import com.sksamuel.elastic4s.ElasticDsl._
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
+import slick.backend.DatabaseConfig
+import slick.driver.JdbcProfile
 
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object QueryClient {
+object SearchClient {
   val scoreSort = field sort "_score"
   val picDomain = "https://img.gohappy.com.tw/images/product"
 
-  def query(condition: SearchCondition) = {
+  def query(condition: SearchCondition, dbConfig: DatabaseConfig[JdbcProfile]) = {
     val client = ElsClient.connectEls
     val typeName = ElsClient.typeName
     val size = condition.size
-    val startNum = ((condition.page - 1) * size)
+    val startNum = (condition.page - 1) * size
 
     val queryString = condition.queryString
 
-    val result = client.execute {
-      val queryDefine = search in "product" / typeName start startNum limit size rawQuery {
-        s"""{
-           |  "bool": {
-           |            "should": [
-           |                { "match": { "all_category_path_name":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 1
-           |                    }
-           |                  }
-           |                },
-           |                { "match": { "product_name":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 2.3333
-           |                    }
-           |                  }
-           |                },
-           |                { "match": { "desc_brief":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 2
-           |                    }
-           |                  }
-           |                },
-           |                { "match": { "author":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 2
-           |                    }
-           |                  }
-           |                },
-           |                { "match": { "publisher":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 1.6667
-           |                    }
-           |                  }
-           |                },
-           |                { "match": { "isbn":
-           |                    {"query":"$queryString",
-           |                    "operator" : "or",
-           |                      "boost" : 1.6667
-           |                    }
-           |                  }
-           |                }
-           |            ]
-           |        }
-           |  }
-           | """.stripMargin
-      } aggs {
-        aggregation terms "category_aggs" field "all_category_path" size 0 order Terms.Order.aggregation("_term", true)
-      }
 
-      val filters = condition.filters.map {
-        ElsColumnDefine.defineFilter
-      }
-
-      if (!filters.isEmpty) {
-        queryDefine postFilter {
-          and(filters: _*)
+    ElasticQueryProcessing.mainQuery(queryString, dbConfig).flatMap{ kk =>
+      val result = client.execute {
+        val queryDefine = search in "product" / typeName start startNum limit size rawQuery {
+          kk
+        } aggs {
+          aggregation terms "category_aggs" field "all_category_path" size 0 order Terms.Order.aggregation("_term", true)
         }
+
+        val filters = condition.filters.map {
+          ElsColumnDefine.defineFilter
+        }
+
+        if (filters.nonEmpty) {
+          queryDefine postFilter {
+            and(filters: _*)
+          }
+        }
+
+
+        val sortList = condition.sort.map { elsSort => field sort elsSort.key order elsSort.order } :+ scoreSort
+
+        queryDefine sort (sortList: _*)
+
+        println(s"query json : $queryDefine")
+        queryDefine
       }
+      result.onComplete(w => client.close())
 
+      result
+    }
 
-      val sortList = condition.sort.map { elsSort => field sort elsSort.key order elsSort.order } :+ scoreSort
-
-      queryDefine sort (sortList: _*)
-
-      println(s"query json : $queryDefine")
-      queryDefine
-    }.await
-
-    client.close()
-    result
   }
 
   def extractSearchResponse(resp: SearchResponse, platform: Platform) = {

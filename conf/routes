@@ -14,5 +14,6 @@ GET     /checkenv                   @com.feec.search.api.controllers.CheckEnv.ch
 
 # search
 GET     /search                     com.feec.search.api.controllers.SearchController.query
+POST     /search                     com.feec.search.api.controllers.SearchController.query
 
 GET     /doc/*file                  controllers.Assets.at(path="/public/document", file)

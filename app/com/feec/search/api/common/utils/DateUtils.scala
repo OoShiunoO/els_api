@@ -3,12 +3,16 @@ package com.feec.search.api.common.utils
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
+import org.joda.time.format.DateTimeFormat
+
 import scala.util.Try
 
 object DateUtils {
 
   val DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
   val DATE_FORMAT = "yyyyMMdd"
+
+  val TIMESTAMP_FORMATTER = DateTimeFormat.forPattern("yyyyMMddHHmmss")
 
 
   def parse(value: String, pattern: String): Option[Date] = Try {

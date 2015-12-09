@@ -11,7 +11,7 @@ object JsonService {
   val emptySearchResponse = Json.obj().transform(
     (__ \ 'payload).json.put(Json.obj("total" -> JsNumber(0), "products" -> JsNull, "aggregations" -> JsNull))).get
 
-  def addHeader(jsonObj: JsObject, status: Response.Status, timestamp: Long) = {
+  def addHeader(jsonObj: JsObject, status: Response.Status, timestamp: String) = {
     Json.obj("response" -> Json.obj("status" -> status.toString, "message" -> status.message, "timestamp" -> timestamp)) ++ jsonObj
   }
 

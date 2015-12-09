@@ -50,7 +50,7 @@ Property | Type | Description | Required
 --|--|--|--
 `query`|string | 搜尋字串   | Y
 `page` |  integer | 頁數 `default = 1` |
-`size` |  integer | 每頁呈現商品數, 最小值為10 `default = 20`|
+`size` |  integer | 每頁呈現商品數, 最小值為1 `default = 20`|
 `filter` |  string | 對搜尋結果的filter,可直接使用`response:aggregations:category_path_id`|
 `platform`|  string  | 來源平台, `Web: 大網`, `App: IOS & Android` [App response format 說明](http://10.97.13.150:9000/doc/els_api_spec_app.html) , `default=Web` |
 `sort` | string | 商品排序方式, `Related: 最相關`, `PriceLow: 網路價從低到高`, `PriceHigh: 網路價從高到低`, `default=Related`  |
