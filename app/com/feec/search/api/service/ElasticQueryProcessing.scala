@@ -16,8 +16,13 @@ object ElasticQueryProcessing {
   def mainQuery(primary: String, dbConfig: DatabaseConfig[JdbcProfile]): Future[String] = {
     /** Get synonym from database */
     val synonym = TableQuery[SynonymT]
+
+    val tokens = primary.split("　").toList
+    val tails = if (tokens.length == 1) ""
+                else "　" + tokens.tails.mkString("　")
+
     def query = synonym.filter(x =>
-      x.primarykey === primary).map(w => (w.channel, w.synonym)).result
+      x.primarykey === tokens.head).map(w => (w.channel, w.synonym)).result
     val response = dbConfig.db.run(query)
 
     response.map{ s =>
@@ -25,7 +30,7 @@ object ElasticQueryProcessing {
       val channel = if (numAlt == 0)  0 else s.head._1
 
       if (numAlt != 0 && channel == 2) {
-        val matchAlt1 = s.map(w => matchBlock(w._2, 0.8)).mkString(",")
+        val matchAlt1 = s.map(w => matchBlock(w._2 + tails, 0.8)).mkString(",")
 
         s"""{
             |  "bool": {
@@ -37,7 +42,7 @@ object ElasticQueryProcessing {
             |}
      """.stripMargin
       } else if (numAlt != 0 && channel == 1) {
-        val matchAlt2 = s.map(w => matchBlock(w._2, 1)).mkString(",")
+        val matchAlt2 = s.map(w => matchBlock(w._2 + tails, 1)).mkString(",")
 
         s"""{
            |  "bool": {

@@ -30,8 +30,6 @@ object SearchClient {
     val queryString = condition.queryString
 
 
-
-
     ElasticQueryProcessing.mainQuery(queryString, dbConfig).flatMap{ kk =>
       val result = client.execute {
         val queryDefine = search in "product" / typeName start startNum limit size rawQuery {
