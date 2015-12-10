@@ -10,6 +10,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc._
 import slick.driver.JdbcProfile
 
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -22,26 +23,29 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
 
     val condition = ApiService.checkSearchCondition(OriSearchCondition(request.getQueryString("query"), request.getQueryString("page"), request.getQueryString("size"), request.getQueryString("filter"), request.getQueryString("platform"), request.getQueryString("sort"), request.getQueryString("price_lower"), request.getQueryString("price_upper")))
 
-    lazy val searchResponse = SearchClient.query(condition.get, dbConfig)
-    searchResponse.map{ x =>
-      lazy val extractJsonResult = SearchClient.extractSearchResponse(x, condition.get.platform)
+    val status = try {
+      condition match {
+        case Some(_) => {
+          val searchResponse = SearchClient.query(condition.get, dbConfig)
+          searchResponse.map { aa =>
+            val extractJsonResult = SearchClient.extractSearchResponse(aa, condition.get.platform)
+            (Some(extractJsonResult), ApiService.checkSearchJsonResult(extractJsonResult))
+          }
 
-      val status = try {
-        condition match {
-          case Some(_) =>
-            ApiService.checkSearchJsonResult(extractJsonResult)
-          case None =>
-            Response.LostNecessary
         }
-      } catch {
-        case NonFatal(e) =>
-          e.printStackTrace()
-          Response.Error
+        case None =>
+          Future.successful((None, Response.LostNecessary))
       }
+    } catch {
+      case NonFatal(e) =>
+        e.printStackTrace()
+        Future.successful((None, Response.Error))
+    }
 
-      val jsonObj = status match {
-        case Response.Ok => extractJsonResult.get
-        case Response.NoMoreResults => JsonService.cleanAggregations(extractJsonResult.get)
+    status.map{ bb =>
+      val jsonObj = bb._2 match {
+        case Response.Ok => bb._1.get.get
+        case Response.NoMoreResults => JsonService.cleanAggregations(bb._1.get.get)
         case Response.Empty => JsonService.emptySearchResponse
         case Response.JsonParseError => JsonService.emptySearchResponse
         case Response.LostNecessary => JsonService.emptySearchResponse
@@ -49,7 +53,7 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
       }
 
 
-      val finalJsonObj = JsonService.addHeader(jsonObj, status, DateUtils.TIMESTAMP_FORMATTER.print(receiveTime))
+      val finalJsonObj = JsonService.addHeader(jsonObj, bb._2, DateUtils.TIMESTAMP_FORMATTER.print(receiveTime))
 
       val pretty = request.getQueryString("pretty")
 
@@ -57,9 +61,13 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
 
       //data collection, use Future
       TrackService.searchDataCollection(condition, request.remoteAddress, finalJsonString)
-
       Ok(finalJsonString).as(JSON)
     }
+
+
+
+
+
 
 
   }

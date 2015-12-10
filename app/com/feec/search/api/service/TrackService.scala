@@ -2,9 +2,10 @@ package com.feec.search.api.service
 
 import java.util.Date
 
-import com.feec.search.api.common.utils.{DBUtils, DCConnectionPool}
+import com.feec.search.api.common.utils.{DateUtils, DBUtils, DCConnectionPool}
 import com.feec.search.api.dao.TrackDao
 import com.feec.search.api.models._
+import org.joda.time.{Duration, DateTime}
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
@@ -21,7 +22,12 @@ object TrackService {
         val json = Json.parse(jsonString)
         val responseStatus = json.transform((__ \ 'response \ 'status).json.pick).get.as[String]
         val total = json.transform((__ \ 'payload \ 'total).json.pick).get.as[Int]
-        val receiveTime = json.transform((__ \ 'response \ 'timestamp).json.pick).get.as[Long]
+        val receiveTimeString = json.transform((__ \ 'response \ 'timestamp).json.pick).get.as[String]
+
+        val receiveTime = DateUtils.TIMESTAMP_FORMATTER.parseDateTime(receiveTimeString)
+        val currentTime = new DateTime()
+        val duration = new Duration(receiveTime, currentTime)
+
 
         val searchTrack = condition match {
           case Some(c) =>
@@ -37,9 +43,12 @@ object TrackService {
             case _ => 0
             }.find(_ > 0)
 
-            SearchTrack(new Date, remoteAddress, c.oriQueryString.getOrElse(null), c.queryString, prefilter.getOrElse(null), lower.getOrElse(0), upper.getOrElse(0), c.page, c.size, c.platform, responseStatus, total, System.currentTimeMillis() - receiveTime)
+            SearchTrack(new Date, remoteAddress, c.oriQueryString.getOrElse(null),
+              c.queryString, prefilter.getOrElse(null), lower.getOrElse(0),
+              upper.getOrElse(0), c.page, c.size, c.platform, responseStatus,
+              total, duration.getMillis)
           case None =>
-            SearchTrack(remoteAddress, responseStatus, total, System.currentTimeMillis() - receiveTime)
+            SearchTrack(remoteAddress, responseStatus, total, duration.getMillis)
         }
 
         insertSearchTrack(searchTrack)
