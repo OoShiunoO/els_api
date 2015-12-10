@@ -43,15 +43,17 @@ object TrackService {
             case _ => 0
             }.find(_ > 0)
 
-            SearchTrack(new Date, remoteAddress, c.oriQueryString.getOrElse(null),
+            val sT = SearchTrack(new Date, remoteAddress, c.oriQueryString.getOrElse(null),
               c.queryString, prefilter.getOrElse(null), lower.getOrElse(0),
               upper.getOrElse(0), c.page, c.size, c.platform, responseStatus,
               total, duration.getMillis)
+
+            insertSearchTrack(sT)
           case None =>
             SearchTrack(remoteAddress, responseStatus, total, duration.getMillis)
         }
 
-        insertSearchTrack(searchTrack)
+        
       } catch {
         case NonFatal(e) => e.printStackTrace
       }

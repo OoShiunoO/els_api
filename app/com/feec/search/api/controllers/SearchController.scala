@@ -21,14 +21,18 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
 
     val receiveTime = new DateTime()
 
-    val condition = ApiService.checkSearchCondition(OriSearchCondition(request.getQueryString("query"), request.getQueryString("page"), request.getQueryString("size"), request.getQueryString("filter"), request.getQueryString("platform"), request.getQueryString("sort"), request.getQueryString("price_lower"), request.getQueryString("price_upper")))
+    val condition = ApiService.checkSearchCondition(
+      OriSearchCondition(request.getQueryString("query"), request.getQueryString("page"),
+        request.getQueryString("size"), request.getQueryString("filter"),
+        request.getQueryString("platform"), request.getQueryString("sort"),
+        request.getQueryString("price_lower"), request.getQueryString("price_upper")))
 
     val status = try {
       condition match {
         case Some(_) => {
           val searchResponse = SearchClient.query(condition.get, dbConfig)
-          searchResponse.map { aa =>
-            val extractJsonResult = SearchClient.extractSearchResponse(aa, condition.get.platform)
+          searchResponse.map { response =>
+            val extractJsonResult = SearchClient.extractSearchResponse(response, condition.get.platform)
             (Some(extractJsonResult), ApiService.checkSearchJsonResult(extractJsonResult))
           }
 
@@ -61,6 +65,7 @@ class SearchController @Inject() (dbConfigProvider: DatabaseConfigProvider) exte
 
       //data collection, use Future
       TrackService.searchDataCollection(condition, request.remoteAddress, finalJsonString)
+
       Ok(finalJsonString).as(JSON)
     }
 
