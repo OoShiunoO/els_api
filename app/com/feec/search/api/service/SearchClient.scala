@@ -30,10 +30,10 @@ object SearchClient {
     val queryString = condition.queryString
 
 
-    ElasticQueryProcessing.mainQuery(queryString, dbConfig).flatMap{ kk =>
+    ElasticQueryProcessing.mainQuery(queryString, dbConfig).flatMap{ query =>
       val result = client.execute {
         val queryDefine = search in "product" / typeName start startNum limit size rawQuery {
-          kk
+          query
         } aggs {
           aggregation terms "category_aggs" field "all_category_path" size 0 order Terms.Order.aggregation("_term", true)
         }
